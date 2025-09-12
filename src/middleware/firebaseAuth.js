@@ -1,5 +1,5 @@
 // Using TypeScript UserModel
-const { UserModel } = require("../infrastructure/models/UserModel");
+const { UserModel } = require("../../infrastructure/models/UserModel");
 
 /**
  * Firebase ID Token verification middleware
@@ -25,7 +25,7 @@ const firebaseAuth = async (req, res, next) => {
     }
 
     // Get Firebase service from container
-    const { Container } = require('../infrastructure/di/Container');
+    const { Container } = require('../../infrastructure/di/Container');
     const container = Container.getInstance();
     const firebaseService = container.getFirebaseService();
 
@@ -113,7 +113,7 @@ const firebaseAuth = async (req, res, next) => {
 
         // Also create user in Systeme.io (with timeout to prevent hanging)
         try {
-          const { Container } = require('../infrastructure/di/Container');
+          const { Container } = require('../../infrastructure/di/Container');
           const container = Container.getInstance();
           const systemeService = container.getSystemeService();
 
@@ -194,7 +194,7 @@ const optionalFirebaseAuth = async (req, res, next) => {
     }
 
     // Get Firebase service from container
-    const { Container } = require('../infrastructure/di/Container');
+    const { Container } = require('../../infrastructure/di/Container');
     const container = Container.getInstance();
     const firebaseService = container.getFirebaseService();
     const userService = container.getUserService();

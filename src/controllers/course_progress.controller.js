@@ -1,6 +1,6 @@
 const Course = require('../models/courses.model');
 const CourseProgress = require('../models/userProgress.model');
-const { UserModel } = require('../infrastructure/models/UserModel');
+const { UserModel } = require('../../infrastructure/models/UserModel');
 const axios = require('axios');
 
 

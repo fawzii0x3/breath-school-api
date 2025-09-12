@@ -3,7 +3,7 @@ const fs = require("fs");
 const { buffer } = require('node:stream/consumers');
 const stripePackage = require('stripe');
 const { STRIPE: { secret, webhookSecret } } = require('../configs/vars')
-const { UserModel } = require('../infrastructure/models/UserModel');
+const { UserModel } = require('../../infrastructure/models/UserModel');
 const stripe = stripePackage(secret);
 
 

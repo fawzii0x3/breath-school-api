@@ -5,7 +5,7 @@ const {
   BasicMatiRues,
   urlBackend,
 } = require("../configs/vars");
-const { UserModel } = require("../infrastructure/models/UserModel");
+const { UserModel } = require("../../infrastructure/models/UserModel");
 const bcrypt = require('bcryptjs');
 const crypto = require("crypto");
 const nodemailer = require('nodemailer')

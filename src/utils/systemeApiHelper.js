@@ -2,7 +2,7 @@ let systemeSDK;
 
 // Initialize the SDK with the API key using the TypeScript wrapper
 try {
-  systemeSDK = require('../infrastructure/external-services/SystemeWrapper').default;
+  systemeSDK = require('../../infrastructure/external-services/SystemeWrapper').default;
   systemeSDK.auth(process.env.API_SYSTEME_KEY);
 } catch (error) {
   console.error('Failed to initialize Systeme SDK in helper:', error);
