@@ -1,29 +1,54 @@
 const controller = require('../controllers/user.controller')
 const { Router } = require('express')
 const { authorize, ADMIN, LOGGED_USER } = require('../utils/auth');
+const { firebaseAuth, optionalFirebaseAuth } = require('../middleware/firebaseAuth');
 let router = Router()
 
+// Firebase authentication route - validates token and creates user if needed
+router
+    .route('/auth/firebase')
+    .post(firebaseAuth, (req, res) => {
+        res.json({
+            success: true,
+            message: 'Firebase authentication successful',
+            user: req.user,
+            firebaseUser: req.firebaseUser
+        });
+    });
+
+// Get current user profile
 router
     .route('/me')
-    .get(authorize(), controller.getOne)
+    .get(firebaseAuth, controller.getOne)
+
+// Delete current user account
 router
     .route('/delete')
-    .delete(authorize(), controller.deleteUser)
+    .delete(firebaseAuth, controller.deleteUser)
+
+// Get user by email (public endpoint)
 router
     .route('/users/:email')
     .get(controller.getUserByEmail)
 
+// Update user subscription status
 router
     .route('/updateSubscriptionStatus')
-    .put(authorize(), controller.updateSubscriptionStatus)
+    .put(firebaseAuth, controller.updateSubscriptionStatus)
 
-
+// Add music to favorites
 router
     .route('/add-favorite/music/:music')
-    .put(authorize(), controller.addFavoriteMusic)
+    .put(firebaseAuth, controller.addFavoriteMusic)
 
- router
+// Add video to favorites
+router
     .route('/add-favorite/video/:video')
-    .put(authorize(), controller.addFavoriteVideo)    
+    .put(firebaseAuth, controller.addFavoriteVideo)
+
+// Check and create user (creates in both MongoDB and Systeme.io)
+router
+    .route('/check-and-create/:email')
+    .get(controller.getUserByEmail)
 
 module.exports = router

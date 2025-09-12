@@ -4,12 +4,13 @@ const Music = require("../models/music.model");
 const axios = require("axios");
 const Category = require('../models/categories.model')
 const AccessMeditationTagsConfig = require('../configs/access')
+const { getUserTagsFromSysteme } = require('../utils/systemeApiHelper')
 const hasAnyTag = (userTags, tagsToCheck) => {
     return tagsToCheck.some(tag => userTags.includes(tag));
   };
 exports.getGuidedMeditationMusicByCategory = async (req, res, next) => {
     try {
-      const userEmail = req.query.email;
+      const userEmail = req.user?.email;
       
       // First, get the guided meditation category ObjectId
       const guidedMeditationCategory = await Category.findOne({ name: 'guided meditation' });
@@ -18,16 +19,10 @@ exports.getGuidedMeditationMusicByCategory = async (req, res, next) => {
       }
   
       let userTags = [];
-     if(userEmail){
+     if(userEmail && userEmail !== 'undefined' && userEmail.trim() !== ''){
         try {
-            // Get user tags from Systeme.io
-            const response = await axios.get(`https://api.systeme.io/api/contacts?email=${userEmail}`, {
-              headers: {
-                'x-api-key': process.env.API_SYSTEME_KEY,
-              },
-            });
-            const contacts = response.data?.items[0] ?? null;
-            userTags = contacts ? contacts.tags.map(tag => tag.name) : [];
+            // Get user tags from Systeme.io using helper function
+            userTags = await getUserTagsFromSysteme(userEmail);
           } catch (error) {
             console.error('Error fetching user tags:', error);
             userTags = [];

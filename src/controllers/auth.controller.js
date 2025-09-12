@@ -5,7 +5,7 @@ const {
   BasicMatiRues,
   urlBackend,
 } = require("../configs/vars");
-const User = require("../models/user.model");
+const { UserModel } = require("../../app/infrastructure/models/UserModel");
 const bcrypt = require('bcryptjs');
 const crypto = require("crypto");
 const nodemailer = require('nodemailer')
@@ -31,7 +31,7 @@ const validateUserData = async (userData) => {
 };
 
 const findUserByEmail = async (email) => {
-  return User.findOne({ email: email.toLowerCase() });
+  return UserModel.findOne({ email: email.toLowerCase() });
 };
 
 exports.store = async (req, res, next) => {
@@ -42,13 +42,13 @@ exports.store = async (req, res, next) => {
     const validationErrors = await validateUserData(req.body);
     if (validationErrors) return res.status(400).json({ success: false, info: "Invalid data structure", data: validationErrors });
 
-    const newUser = new User({ ...req.body, email: req.body.email.toLowerCase() });
+    const newUser = new UserModel({ ...req.body, email: req.body.email.toLowerCase() });
     const savedUser = await newUser.save();
 
     if (!savedUser._id) return res.status(400).json({ success: false, info: "Fatal Error, unable to store User, try later" });
 
     const tokenData = { type: savedUser.role === "user" ? 1 : 2, email: savedUser.email, password: req.body.password };
-    const resp = await User.findAndGenerateToken(tokenData);
+    const resp = await UserModel.findAndGenerateToken(tokenData);
 
     if (!resp || !resp.success) return res.status(400).json({ ...resp, success: false });
 
@@ -86,7 +86,7 @@ exports.login = async (req, res, next) => {
 
         if (hasValidTag) {
           // Check if user already exists in our DB
-          let existingUser = await User.findOne({ email: em });
+          let existingUser = await UserModel.findOne({ email: em });
           
           if (!existingUser) {
             // Get fields from Systeme.io response
@@ -110,7 +110,7 @@ exports.login = async (req, res, next) => {
     }
 
     // Now try local authentication
-    const resp = await User.findAndGenerateToken(req.body);
+    const resp = await UserModel.findAndGenerateToken(req.body);
     
     if (resp === null || !resp.success) {
       return res.status(400).json({ 
@@ -138,7 +138,7 @@ exports.changePassword = async (req, res, next) => {
     // Validate Passwords
    
 
-    const user = await User.findById(userId);
+    const user = await UserModel.findById(userId);
     if (!user) {
       return res.status(404).json({ success: false, info: "User not found" });
     }
@@ -165,7 +165,7 @@ exports.changePassword = async (req, res, next) => {
 exports.generateResetToken = async (req, res, next) => {
  try {
   const userEmail = req.body.email;
-  const user = await User.findOne({ email: userEmail });
+  const user = await UserModel.findOne({ email: userEmail });
 
   if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -212,7 +212,7 @@ exports.generateResetToken = async (req, res, next) => {
 exports.resetPassword = async (req, res, next) => {
   const { token, newPassword } = req.body;
 
-  const user = await User.findOne({ 
+  const user = await UserModel.findOne({ 
       resetPasswordToken: token, 
       resetPasswordExpires: { $gt: Date.now() } 
   });

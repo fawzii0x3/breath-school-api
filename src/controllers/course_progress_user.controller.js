@@ -9,7 +9,7 @@ const fullAccessTags = ["Enrolled_Holistic Membership"];
 
 
 
-const User = require("../models/user.model");
+const { UserModel } = require("../../app/infrastructure/models/UserModel");
 const limitedAccessRules = {
     Enrolled_to_Sleep_Membership: ["7"],
     "Purchased_9-Day Breathwork Course": ["4"],
@@ -118,7 +118,7 @@ exports.getLessonProgress = async (req, res) => {
 exports.getCourseSectionsAndLessons = async (req, res) => {
     try {
       const { courseId } = req.params;
-      const userEmail = req.query.email;
+      const userEmail = req.user?.email;
   
       const course = await Course.findById(courseId);
       if (!course) {
@@ -146,24 +146,15 @@ exports.getCourseSectionsAndLessons = async (req, res) => {
         });
       }
   
-      // Get user tags from Systeme.io
-      const response = await axios.get(
-        `https://api.systeme.io/api/contacts?email=${userEmail}`,
-        {
-          headers: {
-            "x-api-key": process.env.API_SYSTEME_KEY,
-          },
-        }
-      );
-  
-      const contacts = response.data?.items[0] ?? null;
-      const userTags = contacts ? contacts.tags.map((tag) => tag.name) : [];
+      // Get user tags from Systeme.io using helper
+      const { getUserTagsFromSysteme } = require('../utils/systemeApiHelper');
+      const userTags = await getUserTagsFromSysteme(userEmail);
   
       const hasFullAccess = userTags.some((tag) => fullAccessTags.includes(tag));
       const hasSpecificAccess = course.accessTags.some((tag) => userTags.includes(tag));
   
       // Get user progress
-      const user = await User.findOne({ email: userEmail });
+      const user = await UserModel.findOne({ email: userEmail });
       const progressData = user ? 
         await CourseProgress.findOne({ userId: user._id, courseId: course._id }) : null;
   
@@ -229,7 +220,7 @@ exports.getCourseSectionsAndLessons = async (req, res) => {
 
   exports.getCourses = async (req, res) => {
     try {
-      const userEmail = req.query.email;
+      const userEmail = req.user?.email;
       //const courses = await Course.find().select('-sections').sort({ order: 1, createdAt: -1 });
       const courses = await Course.find().sort({ order: 1, createdAt: -1 });
       if (!userEmail) {
@@ -248,19 +239,11 @@ exports.getCourseSectionsAndLessons = async (req, res) => {
         });
       }
   
-      const response = await axios.get(
-        `https://api.systeme.io/api/contacts?email=${userEmail}`,
-        {
-          headers: {
-            "x-api-key": process.env.API_SYSTEME_KEY,
-          },
-        }
-      );
+      // Get user tags from Systeme.io using helper
+      const { getUserTagsFromSysteme } = require('../utils/systemeApiHelper');
+      const userTags = await getUserTagsFromSysteme(userEmail);
   
-      const contacts = response.data?.items[0] ?? null;
-      const userTags = contacts ? contacts.tags.map((tag) => tag.name) : [];
-  
-      const user = await User.findOne({ email: userEmail });
+      const user = await UserModel.findOne({ email: userEmail });
       const userProgresses = user ? await CourseProgress.find({ userId: user._id }) : [];
   
       const progressMap = userProgresses.reduce((acc, progress) => {

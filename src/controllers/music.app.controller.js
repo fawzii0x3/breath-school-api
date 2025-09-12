@@ -157,7 +157,7 @@ exports.getAllFavoritesByCategory = async (req, res, next) => {
 
 exports.getShakraMusicByCategory = async (req, res, next) => {
   try {
-    const userEmail = req.query.email;
+    const userEmail = req.user?.email;
     
     // First, get the shakra category ObjectId
     const shakraCategory = await Category.findOne({ name: 'shakra' });

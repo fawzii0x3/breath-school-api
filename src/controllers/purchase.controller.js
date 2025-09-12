@@ -3,7 +3,7 @@ const fs = require("fs");
 const { buffer } = require('node:stream/consumers');
 const stripePackage = require('stripe');
 const { STRIPE: { secret, webhookSecret } } = require('../configs/vars')
-const User = require('../models/user.model');
+const { UserModel } = require('../../app/infrastructure/models/UserModel');
 const stripe = stripePackage(secret);
 
 
@@ -62,7 +62,7 @@ exports.confirm = async (req, res, next) => {
       let data = JSON.parse(event)
       let customer = await stripe.customers.retrieve(data.data.object.customer)
       if (customer.email) {
-        await User.findOneAndUpdate({ email: { $regex: customer.email, $options: "i" } }, { suscription: true })
+        await UserModel.findOneAndUpdate({ email: { $regex: customer.email, $options: "i" } }, { suscription: true })
       }
 
     } catch (err) {

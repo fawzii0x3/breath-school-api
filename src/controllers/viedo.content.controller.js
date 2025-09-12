@@ -43,7 +43,7 @@ exports.createVideoContent = async (req, res) => {
 exports.getVideos = async (req, res) => {
   try {
     const { type } = req.query;
-    const userEmail = req.query.email;
+    const userEmail = req.user?.email;
 
     // Base query
     const query = {};
@@ -60,14 +60,9 @@ exports.getVideos = async (req, res) => {
 
       if (userEmail) {
         try {
-          const response = await axios.get(`https://api.systeme.io/api/contacts?email=${userEmail}`, {
-            headers: {
-              'x-api-key': process.env.API_SYSTEME_KEY
-            },
-          });
-
-          const contacts = response.data?.items[0] ?? null;
-          const userTags = contacts ? contacts.tags.map(tag => tag.name) : [];
+          // Get user tags from Systeme.io using helper
+          const { getUserTagsFromSysteme } = require('../utils/systemeApiHelper');
+          const userTags = await getUserTagsFromSysteme(userEmail);
 
           const hasFullAccess = hasAnyTag(userTags, fullAccessTagsVideo);     
           hasAccess = hasFullAccess 

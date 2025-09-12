@@ -1,6 +1,6 @@
 const Course = require('../models/courses.model');
 const CourseProgress = require('../models/userProgress.model');
-const User = require('../models/user.model');
+const { UserModel } = require('../../app/infrastructure/models/UserModel');
 const axios = require('axios');
 
 
@@ -246,7 +246,7 @@ exports.getCourseProgress = async (req, res, next) => {
 exports.getCourseStatistics = async (req, res) => {
   try {
       const userEmail = req.user.email;
-      const user = await User.findOne({ email: userEmail });
+      const user = await UserModel.findOne({ email: userEmail });
       if (!user) {
           return res.status(404).json({ message: "User not found" });
       }
