@@ -9,7 +9,7 @@ const fullAccessTags = ["Enrolled_Holistic Membership"];
 
 
 
-const { UserModel } = require("../../app/infrastructure/models/UserModel");
+const { UserModel } = require("../infrastructure/models/UserModel");
 const limitedAccessRules = {
     Enrolled_to_Sleep_Membership: ["7"],
     "Purchased_9-Day Breathwork Course": ["4"],

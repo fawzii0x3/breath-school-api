@@ -1,17 +1,21 @@
 {
   "name": "rossi",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "start": "cross-env NODE-ENV=production node src/index.js",
-    "start-dev": "cross-env NODE_ENV=development node src/index.js",
-    "dev": "cross-env NODE_ENV=development nodemon src/index.js",
-    "build": "tsc",
+    "start": "cross-env NODE_ENV=production node dist/index.js",
+    "start-dev": "cross-env NODE_ENV=development node dist/index.js",
+    "dev": "cross-env NODE_ENV=development nodemon dist/index.js",
+    "build": "npm run clean && tsc && npm run copy-assets",
     "build:watch": "tsc --watch",
-    "dev:hex": "cross-env NODE_ENV=development ts-node --transpile-only app/index.ts",
-    "start:ts": "cross-env NODE_ENV=production ts-node app/index.ts",
-    "dev:ts": "cross-env NODE_ENV=development ts-node --transpile-only app/index.ts",
-    "dev:ts:watch": "cross-env NODE_ENV=development nodemon --exec ts-node --transpile-only app/index.ts"
+    "clean": "rimraf dist",
+    "copy-assets": "cp -r src/configs dist/ && cp -r src/controllers dist/ && cp -r src/data dist/ && cp -r src/middleware dist/ && cp -r src/models dist/ && cp -r src/routes dist/ && cp -r src/services dist/ && cp -r src/utils dist/",
+    "dev:hex": "cross-env NODE_ENV=development USE_HEXAGONAL=true ts-node --transpile-only src/index.ts",
+    "start:ts": "cross-env NODE_ENV=production USE_HEXAGONAL=true ts-node src/index.ts",
+    "dev:ts": "cross-env NODE_ENV=development USE_HEXAGONAL=true ts-node --transpile-only src/index.ts",
+    "dev:ts:watch": "cross-env NODE_ENV=development USE_HEXAGONAL=true nodemon --exec ts-node --transpile-only src/index.ts",
+    "dev:legacy": "cross-env NODE_ENV=development USE_HEXAGONAL=false node src/index.js",
+    "start:legacy": "cross-env NODE_ENV=production USE_HEXAGONAL=false node src/index.js"
   },
   "description": "",
   "dependencies": {
@@ -61,6 +65,7 @@
     "@types/mongoose": "^5.11.97",
     "@types/node": "^20.10.0",
     "nodemon": "^3.1.9",
+    "rimraf": "^5.0.0",
     "ts-node": "^10.9.0",
     "typescript": "^5.3.0"
   },

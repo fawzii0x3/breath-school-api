@@ -1,5 +1,5 @@
 // Temporarily using direct model access until hexagonal architecture is fully integrated
-const { UserModel } = require("../../app/infrastructure/models/UserModel");
+const { UserModel } = require("../infrastructure/models/UserModel");
 
 exports.addFavoriteMusic = async (req, res, next) => {
   try {
@@ -26,7 +26,7 @@ exports.getUserByEmail = async (req, res, next) => {
     const { email } = req.params;
     
     // Use the new check and create functionality
-    const { Container } = require('../../app/infrastructure/di/Container');
+    const { Container } = require('../infrastructure/di/Container');
     const container = Container.getInstance();
     const userService = container.getUserService();
     
@@ -84,7 +84,7 @@ exports.getOne = async (req, res, next) => {
     
     // If email is provided, use the new check and create functionality
     if (email) {
-      const { Container } = require('../../app/infrastructure/di/Container');
+      const { Container } = require('../infrastructure/di/Container');
       const container = Container.getInstance();
       const userService = container.getUserService();
       

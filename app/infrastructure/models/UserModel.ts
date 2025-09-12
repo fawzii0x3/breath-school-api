@@ -4,7 +4,9 @@ import moment from 'moment';
 import { IUserDocument } from './types';
 
 // Define the User interface extending IUserDocument
-export interface IUser extends Document, IUserDocument {}
+export interface IUser extends IUserDocument {
+  _id: string;
+}
 
 // Define the User schema
 const UserSchema = new Schema<IUser>({
@@ -65,7 +67,7 @@ UserSchema.virtual('promotionDays').get(function() {
 });
 
 // Post middleware to calculate promotion days
-UserSchema.post(['findOne', 'findById'], async function(result: IUser) {
+UserSchema.post('findOne', async function(result: IUser) {
   try {
     if (result && result.createdAt) {
       const createdAt = moment(result.createdAt);
@@ -73,7 +75,7 @@ UserSchema.post(['findOne', 'findById'], async function(result: IUser) {
       const diff = now.diff(createdAt, 'days');
       
       // Set the virtual field
-      result.set('promotionDays', diff);
+      (result as any).set('promotionDays', diff);
       
       // Additional logic for promotion days > 7
       if (diff > 7) {
